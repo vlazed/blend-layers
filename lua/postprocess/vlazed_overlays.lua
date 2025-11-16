@@ -1,3 +1,5 @@
+VLAZED_OVERLAY_ROOT = "/"
+
 local mat_overlay_template = Material("pp/vlazed/overlay")
 
 local pp_overlay = CreateClientConVar("pp_vlazedoverlays", "0", true, false, "Enable overlays", 0, 1)
@@ -71,7 +73,7 @@ local function generateOverlayMaterial(index, image)
 
 	if overlay:IsError() then
 		overlay = CreateMaterial(overlayId, "screenspace_general", {
-			["$pixshader"] = "vlazed_overlay1_ps30",
+			["$pixshader"] = "vlazed_overlay_ps30",
 			["$basetexture"] = "_rt_FullFrameFB",
 			["$ignorez"] = 1,
 			["$cull"] = 1,
@@ -271,6 +273,49 @@ list.Set("PostProcess", "Overlay (vlazed)", {
 		local name = layerSettings:TextEntry("Layer name", "")
 		---@class OverlayImage: DTextEntry
 		local image = layerSettings:TextEntry("Image path", "")
+		---@class OverlayBrowseImage: DImageButton
+		local imageButton = vgui.Create("DImageButton", image)
+		imageButton:SetImage("icon16/folder_image.png")
+
+		function image:PerformLayout(w, h)
+			imageButton:SetSize(h, h)
+			imageButton:SetPos(w - h, 0)
+		end
+
+		function imageButton:DoClick()
+			local fileBrowserFrame = vgui.Create("DFrame")
+			---@class OverlayFileBrowser: DFileBrowser
+			local fileBrowser = vgui.Create("DFileBrowser", fileBrowserFrame)
+			fileBrowserFrame:SetTitle("Select image")
+			---@class FileSelect: DButton
+			local fileBrowserSelect = vgui.Create("DButton", fileBrowserFrame)
+
+			fileBrowserFrame:SetSize(width / 3, height / 3)
+			fileBrowserFrame:SetPos(width / 2 - width / 6, height / 2 - height / 6)
+
+			fileBrowser:SetPath("GAME")
+			fileBrowser:SetBaseFolder(VLAZED_OVERLAY_ROOT)
+			fileBrowser:SetFileTypes("*.png *.jpg *.jpeg *.vmt")
+			fileBrowser:Dock(FILL)
+			fileBrowserSelect:Dock(BOTTOM)
+
+			fileBrowserSelect:SetText("Select image")
+
+			fileBrowserFrame:MakePopup()
+
+			local selectedFile = ""
+			function fileBrowser:OnSelect(filePath)
+				selectedFile = filePath
+			end
+
+			function fileBrowserSelect:DoClick()
+				if #selectedFile > 0 then
+					image:SetValue(selectedFile)
+				end
+
+				fileBrowserFrame:Remove()
+			end
+		end
 
 		---@class OverlayBlendModeBox: DComboBox
 		local blendModeBox = layerSettings:ComboBox("Blend Modes") ---@diagnostic disable-line: missing-parameter

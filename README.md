@@ -20,6 +20,7 @@ This adds an overlay shader, which allows one to add layers with different blend
 
 - **Layer system**: Add different image layers on screen
 - **Blending modes**: Set how layers blend into each other
+- **Image file browser**: Find images within GMod for overlays
 - **Presets (WIP)**: Save layer presets into json files, which you can share with friends or distribute on the Steam Workshop
 
 ### Rational
